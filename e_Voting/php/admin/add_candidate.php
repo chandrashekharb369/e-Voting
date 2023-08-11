@@ -20,6 +20,36 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+$data = array(
+    "qualification" => "Some Qualification",
+    "party" => "Some Party",
+    "symbol" => "Some Symbol"
+);
+
+global $qualification, $party, $symbol;
+
+// Your existing code...
+
+if (isset($data["qualification"])) {
+    $qualification = $data["qualification"];
+} else {
+    $qualification = "Default Qualification";
+}
+
+if (isset($data["party"])) {
+    $party = $data["party"];
+} else {
+    $party = "Default Party";
+}
+
+if (isset($data["symbol"])) {
+    $symbol = $data["symbol"];
+} else {
+    $symbol = "Default Symbol";
+}
+
+
+
 
 if (isset($_POST["submit"])) {
     $voter_id = $_POST["voter_id"];
@@ -30,10 +60,11 @@ if (isset($_POST["submit"])) {
     $fathername = $_POST["fathername"];
     $district = $_POST["district"];
     $address = $_POST["address"];
-    $qualification = $_POST["qualification"];
+   
     $about = $_POST["about"];
-    $party = $_POST["party"];
-    $symbole = $_FILES["symbole"]["tmp_name"];
+    $party = $_POST["pname"];
+    
+    
 
 
     $checkQuery = "SELECT * FROM candidate WHERE voter_id = '$voter_id'";
@@ -49,14 +80,18 @@ if (isset($_POST["submit"])) {
         $stmt->bind_param("ssssssssssss", $voter_id, $photoData, $firstname, $lastname, $dob, $fathername, $district, $address, $qualification, $about, $party, $symboleData); // Bind the parameters
 
         // Read the photo file and convert it to binary data
-        $photoData = file_get_contents($photo);
-        $symboleData = file_get_contents($symbole);
+        $photoData = file_get_contents($_FILES["photo"]["tmp_name"]);
+        // ...
+        $symboleData = file_get_contents($_FILES["symbol"]["tmp_name"]);
 
-        if ($stmt->execute()) {
-            echo "<script>alert('New candidate added successfully.');</script>";
-        } else {
-            echo "<script>alert('Error adding candidate: " . $stmt->error . "');</script>";
-        }
+
+if ($stmt->execute()) {
+    echo "<script>alert('New candidate added successfully.');</script>";
+} else {
+    echo "<script>alert('Error adding candidate: " . $stmt->error . "');</script>";
+}
+// ...
+
 
         $stmt->close();
     }
@@ -95,8 +130,8 @@ $conn->close();
             var photoFile = photoField.files[0];
             var photoFileName = photoFile.name;
             var photoFileType = photoFileName.split(".").pop().toLowerCase();
-            if (photoFileType !== "jpeg") {
-                alert("Only JPEG format files are allowed for the photo.");
+            if (photoFileType !== "jpg") {
+                alert("Only JPG format files are allowed for the photo.");
                 photoField.value = ""; 
                 return false;
             }
@@ -226,7 +261,7 @@ $conn->close();
 
         .content-wrapper {
         width: calc(100% - 250px);
-        height: 100%;
+        height: 600px;
         position: fixed;
         background: #fff;
         left: 250px;
@@ -284,15 +319,16 @@ $conn->close();
         }
 
       .container {
-        width: 80%;
-        max-width: 100%;
-        margin: 0 auto;
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-         overflow-y: auto;
+    width: 90%; /* Adjust this value to increase or decrease the container width */
+    max-width: 100%;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
 }
+
 
         .container label,
         select {
@@ -395,35 +431,48 @@ $conn->close();
         
         <div class="container">
             <h1>Add Candidate</h1>
-        <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
-            <div>
-                 <div>
+       <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+           <div>
     <label for="photo">Photo:</label>
-    <input type="file" id="photo" name="photo" accept=".jpeg" required>
-</div><br>
-<img class="photoPreview" src="#" alt="Preview" style="max-width: 100px; max-height: 100px; border: 1px solid #ccc;margin-right: 150px;">
+    <input type="file" id="photo" name="photo" accept=".jpg" required>
+
 </div>
-<script type="text/javascript">
+<br>
+             <div>
+                <img class="photoPreview" src="#" alt="Preview" style="max-width: 100px; max-height: 100px; border: 1px solid #ccc;margin-right: 150px;
+                ">
+                </div>
+               <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function () {
-    const symbolInput = document.getElementById('photo'); 
-    const symbolPreview = document.querySelector('.photoPreview'); 
+    const photoInput = document.getElementById('photo');
+    const symbolInput = document.getElementById('symbol');
+    const photoPreview = document.querySelector('.photoPreview');
+    const symbolPreview = document.querySelector('.symbolPreview');
+
+    photoInput.addEventListener('change', function (event) {
+        previewFile(event.target.files[0], photoPreview);
+    });
 
     symbolInput.addEventListener('change', function (event) {
-        const file = event.target.files[0];
+        previewFile(event.target.files[0], symbolPreview);
+    });
+
+    function previewFile(file, previewElement) {
         if (file) {
             const reader = new FileReader();
             reader.onload = function () {
-                symbolPreview.src = reader.result;
-                symbolPreview.style.display = 'block'; 
+                previewElement.src = reader.result;
+                previewElement.style.display = 'block';
             };
             reader.readAsDataURL(file);
         } else {
-            symbolPreview.src = '#';
-            symbolPreview.style.display = 'none'; 
+            previewElement.src = '#';
+            previewElement.style.display = 'none';
         }
-    });
+    }
 });
 </script>
+
 
                 <div>
             <div>
@@ -488,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             <div>
                 <label for="qualification">Qualification:</label>
-                <select id="district" name="district" required>
+                <select id="qualification" name="qualification" required>
                     <option value="">Select Qualification</option>
                     <option value="S.S.L.C">S.S.L.C</option>
                     <option value="P.U.C">P.U.C</option>
@@ -503,34 +552,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 <label for="about">About:</label>
                 <textarea id="about" name="about" class="no-resize" required></textarea>
             </div><br>
+            <label for="about">Party:</label>
+                <input type="text" id="about" name="pname" required>
+            </div><br>
            <div>
     <label for="symbole">Symbol:</label> <!-- Corrected the typo: "symbole" to "symbol" -->
-    <input type="file" id="symbol" name="symbol" accept=".jpeg" required>
+    <input type="file" id="symbol" name="symbol" accept=".jpg" required>
 </div><br>
 <img class="symbolPreview" src="#" alt="Preview" style="max-width: 100px; max-height: 100px; border: 1px solid #ccc;margin-right: 150px;">
 </div>
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function () {
-    const symbolInput = document.getElementById('symbol'); 
-    const symbolPreview = document.querySelector('.symbolPreview'); 
 
-    symbolInput.addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function () {
-                symbolPreview.src = reader.result;
-                symbolPreview.style.display = 'block'; 
-            };
-            reader.readAsDataURL(file);
-        } else {
-            symbolPreview.src = '#';
-            symbolPreview.style.display = 'none'; 
-        }
-    });
-});
-</script>
-            <div>
+            <div style="margin-left: 20px;">
                 <button name="submit">Add Candidate</button>
                 <button name="clear" style="background: red;" type="reset">clear</button>
             </div>

@@ -284,7 +284,7 @@ $conn->close();
         <?php
         if (isset($_POST["district"])) {
             if ($result->num_rows > 0) {
-                echo "<p>Total Voters: " . $totalVoters . "</p>"; 
+                echo "<p>Total Candidates: " . $totalVoters . "</p>"; 
                 echo "<table>";
                 echo "<tr><th>Sl. No.</th><th>Photo</th><th>voter id</th><th>Name</th><th>Father</th><th>Age</th><th>Party</th></tr>";
                 $serialNumber = 1;
