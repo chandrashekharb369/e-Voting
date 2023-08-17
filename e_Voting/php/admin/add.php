@@ -18,29 +18,43 @@ if (isset($_POST["submit"])) {
     $password = $_POST["password"];
 
     
-    if ($checkResult->num_rows > 0) {
-        // Username is already taken
-        echo "<script>alert('Voter already exists. Please choose a different Voter ID.');</script>";
+
+
+    // Check if the voter already exists in the database
+$checkQuery = "SELECT * FROM voter WHERE username = ?";
+$checkStmt = $conn->prepare($checkQuery);
+$checkStmt->bind_param("s", $username);
+$checkStmt->execute();
+$checkResult = $checkStmt->get_result();
+
+if ($checkResult->num_rows > 0) {
+    // Voter already exists, show error message
+    echo "<script>alert('Voter already exists. Please choose a different Voter ID.');</script>";
+} else {
+    // Insert the new voter into the database
+    $insertQuery = "INSERT INTO voter (photo, username, name, dob, father, district, address, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($insertQuery);
+    $stmt->bind_param("ssssssss", $photoData, $username, $name, $dob, $father, $district, $address, $password);
+
+    // Read the photo file and convert it to binary data
+    $photoData = file_get_contents($photo);
+
+    if ($stmt->execute()) {
+        echo "<script>alert('New voter added successfully.');</script>";
     } else {
-        // Insert the new voter into the database
-        $insertQuery = "INSERT INTO voter (photo, username, name, dob, father, district, address, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($insertQuery);
-        $stmt->bind_param("ssssssss", $photoData, $username, $name, $dob, $father, $district, $address, $password); // Bind the parameters
-
-        // Read the photo file and convert it to binary data
-        $photoData = file_get_contents($photo);
-
-        if ($stmt->execute()) {
-            echo "<script>alert('New voter added successfully.');</script>";
-        } else {
-            echo "<script>alert('Error adding voter. Please try again.');</script>";
-        }
-
-        $stmt->close();
+        echo "<script>alert('Error adding voter. Please try again.');</script>";
     }
+
+    $stmt->close();
 }
 
+$checkStmt->close(); // Close the check statement
 $conn->close();
+
+   
+}
+
+
 ?>
 <!DOCTYPE html>
 <html>
