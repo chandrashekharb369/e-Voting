@@ -115,7 +115,6 @@ INSERT INTO `polling` (`username`, `district`, `party`) VALUES
 ('002', 'Tumakuru', 'A'),
 ('003', 'Tumakuru', 'A'),
 ('008', 'Tumakuru', 'B'),
-('1234', 'A', NULL),
 ('3699', 'Tumakuru', ''),
 ('3701', 'Tumakuru', 'A'),
 ('3703', 'Tumakuru', 'A');
