@@ -1,1 +1,3 @@
-e_voting System
+e_voting Systm
+
+Electronic voting (e-voting) systems enable citizens to cast their votes electronically, often through secure online platforms or electronic voting machines. These systems aim to streamline the voting process, enhance accessibility, and reduce manual errors. Security measures, such as encryption and authentication protocols, are crucial to ensure the integrity and confidentiality of votes. E-voting can offer real-time results, but it also raises concerns about potential cybersecurity threats and the need for transparent and auditable systems to maintain public trust in the electoral process.
