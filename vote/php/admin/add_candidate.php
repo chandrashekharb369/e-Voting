@@ -67,32 +67,41 @@ if (isset($_POST["submit"])) {
     
 
 
-    $checkQuery = "SELECT * FROM candidate WHERE voter_id = '$voter_id'";
-    $checkResult = $conn->query($checkQuery);
+    
+$currentYear = date("Y");
 
-    if ($checkResult->num_rows > 0) {
-        
-        echo "<script>alert('Voter ID already exists. Please choose a different Voter ID.');</script>";
-    } else {
-        // Insert the new candidate into the database
-        $insertQuery = "INSERT INTO candidate (voter_id, photo, firstname, lastname, dob, fathername, district, address, qualification, about, party, symbole) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($insertQuery);
-        $stmt->bind_param("ssssssssssss", $voter_id, $photoData, $firstname, $lastname, $dob, $fathername, $district, $address, $qualification, $about, $party, $symboleData); // Bind the parameters
+$checkQuery = "SELECT * FROM candidate WHERE voter_id = ?";
+$checkStmt = $conn->prepare($checkQuery);
+$checkStmt->bind_param("s", $voter_id);
+$checkStmt->execute();
+$checkResult = $checkStmt->get_result();
 
-        // Read the photo file and convert it to binary data
-        $photoData = file_get_contents($_FILES["photo"]["tmp_name"]);
-        // ...
-        $symboleData = file_get_contents($_FILES["symbol"]["tmp_name"]);
-
-
-if ($stmt->execute()) {
-    echo "<script>alert('New candidate added successfully.');</script>";
+if ($checkResult->num_rows > 0) {
+    echo "<script>alert('Voter ID already exists. Please choose a different Voter ID.');</script>";
 } else {
-    echo "<script>alert('Error adding candidate: " . $stmt->error . "');</script>";
-}
-// ...
+    
+    $insertQuery = "INSERT INTO candidate (voter_id, photo, firstname, lastname, dob, fathername, district, address, qualification, about, party, symbole, yeAr) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($insertQuery);
+    $stmt->bind_param("sssssssssssss", $voter_id, $photoData, $firstname, $lastname, $dob, $fathername, $district, $address, $qualification, $about, $party, $symboleData, $currentYear); 
+    $photoData = file_get_contents($_FILES["photo"]["tmp_name"]);
+    // ...
+    $symboleData = file_get_contents($_FILES["symbol"]["tmp_name"]);
 
+    
+    $stmt->execute();
 
+    
+    if ($stmt->affected_rows > 0) {
+         echo "<script>
+                alert('Candidate data saved successfully');
+                window.history.back();
+              </script>";
+    } else {
+         echo "<script>
+                alert('Error data saved successfully');
+                window.history.back();
+              </script>";
+    }
         $stmt->close();
     }
 }
@@ -148,163 +157,9 @@ $conn->close();
             return true;
         }
     </script>
+     <link rel="stylesheet" type="text/css" href="../../css/navia.css">
      <style>
-        body {
-            margin: 0;
        
-            font-family: Arial;
-        }
-
-        nav {
-            background: #04045e;
-            position: fixed;
-            width: 100%;
-            max-width: 250px;
-            bottom: 0;
-            top: 0;
-            display: block;
-            min-height: 250px;
-            height: 100%;
-            color: #fff;
-            opacity: 0.8;
-            transition: all 300ms;
-            -moz-transition: all 300ms;
-            -webkit-transition: all 300ms;
-        }
-        
-        
-        nav .vertical-menu hr {
-            opacity: 0.1;
-            border-width: 0.5px;
-        }
-
-        nav ul {
-            width: 90%;
-            padding-inline-start: 0;
-            margin: 10px;
-            height: calc(100% - 20px);
-        }
-
-        nav .vertical-menu-logo {
-            padding: 20px;
-            font-size: 1.3em;
-            position: relative;
-        }
-
-        nav .vertical-menu-logo .open-menu-btn {
-            width: 30px;
-            height: max-content;
-            position: absolute;
-            display: block;
-            right: 20px;
-            top: 0;
-            bottom: 0;
-            margin: auto;
-            cursor: pointer;
-        }
-
-        nav .vertical-menu-logo .open-menu-btn hr {
-            margin: 5px 0;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            margin-top: 30px;
-        }
-
-        ul li {
-            margin-bottom: 10px;
-        }
-
-        ul li a {
-            color: #fff;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            padding: 10px 20px;
-            transition: background-color 0.3s;
-        }
-
-        ul li a i {
-            margin-right: 10px;
-        }
-
-        ul li a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        ul li .dropdown-content {
-            display: none;
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            margin-left: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        ul li:hover .dropdown-content {
-            display: block;
-        }
-
-        ul li .dropdown-content a {
-            color: #000;
-            text-decoration: none;
-            display: block;
-            padding: 5px 0;
-            transition: color 0.3s;
-        }
-
-        ul li .dropdown-content a:hover {
-            color: #4CAF50;
-        }
-
-        .content-wrapper {
-        width: calc(100% - 250px);
-        height: 600px;
-        position: fixed;
-        background: #fff;
-        left: 250px;
-        padding: 20px;
-        overflow-y: scroll;
-}
-
-
-        .closed-menu .content-wrapper {
-            width: 100%;
-            left: 50px;
-        }
-
-        .content-wrapper {
-            transition: all 300ms;
-        }
-
-        .vertical-menu-wrapper .vertical-menu-logo div {
-            transition: all 100ms;
-        }
-
-        .closed-menu .vertical-menu-wrapper .vertical-menu-logo div {
-            margin-left: -300px;
-        }
-
-        .vertical-menu-wrapper .vertical-menu-logo .open-menu-btn {
-            transition: all 300ms;
-        }
-
-        .closed-menu .vertical-menu-wrapper .vertical-menu-logo .open-menu-btn {
-            left: 10px;
-            right: 100%;
-        }
-
-        .closed-menu .vertical-menu-wrapper ul,
-        .closed-menu .vertical-menu-wrapper hr {
-            margin-left: -300px;
-        }
-
-        .vertical-menu-wrapper ul,
-        .vertical-menu-wrapper hr {
-            transition: all 100ms;
-        }
 
         .content-wrapper {
             background: #ebebeb;
@@ -421,6 +276,7 @@ $conn->close();
                 <div class="dropdown-content">
                     <a href="add_candidate.php">Add Candidate</a>
                     <a href="candidate_list.php">Candidate list</a>
+                    <a href="removecnadi.php">Remove Candidate</a>
                 </div>
             </li>
             <li><a href="polling.php"><i class="fas fa-poll"></i> Polling</a></li>

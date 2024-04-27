@@ -394,6 +394,7 @@ if (isset($_POST["submit"])) {
                 <div class="dropdown-content">
                     <a href="add_candidate.php">Add Candidate</a>
                     <a href="candidate_list.php">Candidate list</a>
+                    <a href="removecnadi.php">Remove Candidate</a>
                 </div>
             </li>
             <li><a href="polling.php"><i class="fas fa-poll"></i> Polling</a></li>
