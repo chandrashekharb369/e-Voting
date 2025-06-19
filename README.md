@@ -6,12 +6,6 @@
 [![PHP](https://img.shields.io/badge/PHP-7+-8892be?logo=php&logoColor=white&style=for-the-badge)](https://www.php.net/)  
 [![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql&logoColor=white&style=for-the-badge)](https://www.mysql.com/)
 
----
-
-An intuitive and secure web-based platform designed to facilitate electronic voting processes for organizations, institutions, and communities.
-
-> ⚠️ **Disclaimer**:  
-> This tool is intended solely for **educational and demonstration** purposes. It is **not** designed for stock market investments or any financial trading activities. Using this system for such purposes is strongly discouraged and may lead to unintended consequences.
 
 ---
 
